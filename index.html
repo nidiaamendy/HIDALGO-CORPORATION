@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reporte Meta Ads · Hidalgo Tours · Octubre 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+.viz-root{color-scheme:light;
+ --bg:#f4f3ef;--surface-1:#fcfcfb;--surface-2:#f0efec;--border:#e2e0da;
+ --text-primary:#0b0b0b;--text-secondary:#52514e;--text-muted:#7a7873;
+ --grid:#e6e4de;--axis:#b9b7b0;
+ --s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--s4:#eda100;--s5:#e87ba4;
+ --good:#0ca30c;--good-text:#006300;--critical:#d03b3b;--warning:#fab219;
+ --accent:#1c5cab;}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz-root{color-scheme:dark;
+ --bg:#121211;--surface-1:#1a1a19;--surface-2:#242422;--border:#33332f;
+ --text-primary:#f0efec;--text-secondary:#c3c2b7;--text-muted:#94938a;
+ --grid:#2c2c29;--axis:#55544f;
+ --s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;
+ --good:#0ca30c;--good-text:#3fc23f;--critical:#e66767;--accent:#86b6ef;}}
+:root[data-theme="dark"] .viz-root{color-scheme:dark;
+ --bg:#121211;--surface-1:#1a1a19;--surface-2:#242422;--border:#33332f;
+ --text-primary:#f0efec;--text-secondary:#c3c2b7;--text-muted:#94938a;
+ --grid:#2c2c29;--axis:#55544f;
+ --s1:#3987e5;--s2:#d95926;--s3:#199e70;--s4:#c98500;--s5:#d55181;
+ --good:#0ca30c;--good-text:#3fc23f;--critical:#e66767;--accent:#86b6ef;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg)}
+.viz-root{font-family:Manrope,system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text-primary);background:var(--bg);min-height:100vh;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:40px 24px 64px}
+header .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:700}
+h1{font-size:34px;line-height:1.15;margin:8px 0 12px;font-weight:800;letter-spacing:-.02em}
+.lede{font-size:17px;color:var(--text-secondary);max-width:820px;margin:0}
+.lede b{color:var(--text-primary)}
+.meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.chip{font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--surface-1);border:1px solid var(--border);color:var(--text-secondary)}
+section{margin-top:44px}
+h2{font-size:20px;margin:0 0 4px;font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--text-muted);font-size:14px;margin:0 0 16px}
+.card{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;padding:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi .lab{font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .val{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .note{font-size:13px;color:var(--text-secondary)}
+.delta{font-size:12px;font-weight:700;margin-top:8px;display:inline-flex;gap:4px;align-items:center}
+.up-good{color:var(--good-text)}.down-bad{color:var(--critical)}.neutral{color:var(--text-muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--border)}
+td{padding:9px 10px;border-bottom:1px solid var(--grid)}
+td.n,th.n{text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+.tblwrap{overflow-x:auto}
+.status{display:inline-flex;gap:5px;align-items:center;font-weight:700;font-size:13px}
+.findings{display:grid;grid-template-columns:1fr 1fr;gap:12px;counter-reset:f}
+.finding{position:relative;padding-left:48px}
+.finding:before{counter-increment:f;content:counter(f);position:absolute;left:18px;top:18px;width:22px;height:22px;border-radius:50%;background:var(--surface-2);color:var(--text-secondary);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.finding h3{margin:0 0 4px;font-size:15px}
+.finding p{margin:0;color:var(--text-secondary);font-size:14px}
+.finding p b{color:var(--text-primary)}
+.finding.alert{border-color:var(--critical)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text-secondary);margin-bottom:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.sw.line{height:3px;width:16px;border-radius:2px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:inherit}
+.tip{position:absolute;pointer-events:none;background:var(--surface-1);border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.12);border-radius:10px;padding:8px 11px;font-size:12.5px;color:var(--text-primary);white-space:nowrap;opacity:0;transition:opacity .08s;z-index:5}
+.tip .t{font-weight:800;margin-bottom:3px}
+.tip .r{display:flex;gap:8px;align-items:center;color:var(--text-secondary)}
+.tip .r b{color:var(--text-primary);margin-left:auto;padding-left:12px}
+.ctitle{font-size:14px;font-weight:700;margin:0 0 10px}
+.cr{display:grid;grid-template-columns:minmax(150px,230px) 1fr 90px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--grid)}
+.cr:last-child{border-bottom:none}
+.cr .nm{font-weight:700;font-size:14px}
+.cr .cp{font-size:12px;color:var(--text-muted)}
+.cr .bar{display:flex;height:14px;gap:2px}
+.cr .bar i{display:block;height:100%}
+.cr .bar i:first-child{border-radius:4px 0 0 4px}.cr .bar i:last-child{border-radius:0 4px 4px 0}.cr .bar i:only-child{border-radius:4px}
+.cr .im{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.cr .rs{font-size:12px;color:var(--text-secondary);margin-top:3px}
+.notes{font-size:13px;color:var(--text-secondary)}
+.notes li{margin-bottom:6px}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.findings{grid-template-columns:1fr}h1{font-size:27px}.cr{grid-template-columns:1fr 80px}.cr .bar{grid-column:1/-1;order:3}}
+</style>
+</head>
+<body>
+<div class="viz-root"><div class="wrap">
+
+<header>
+ <div class="eyebrow">Reporte de pauta · Meta Ads · Octubre 2026</div>
+ <h1>Hidalgo Tours: más escala, leads baratos y conversaciones más caras</h1>
+ <p class="lede" id="lede"></p>
+ <div class="meta-row"><span class="chip">Periodo: 1–31 oct 2026</span><span class="chip">Cuenta: HIDALGO TOURS BM</span><span class="chip">8 campañas con inversión</span><span class="chip">Montos en bolivianos (Bs)</span></div>
+</header>
+
+<section>
+ <h2>Indicadores principales</h2>
+ <p class="sub">Total de la cuenta en octubre. Debajo de cada indicador, la variación contra septiembre.</p>
+ <div class="kpis" id="kpis"></div>
+</section>
+
+<section>
+ <h2>Octubre vs. septiembre</h2>
+ <p class="sub">Sin metas cargadas para el mes, la referencia es el mes anterior. El estado indica si el cambio va en la dirección deseada.</p>
+ <div class="card tblwrap"><table id="cmp"></table></div>
+ <p class="sub" style="margin-top:10px">Los costos por resultado se calculan con las campañas que optimizan a ese resultado: el costo por lead, con la campaña de formulario, y el costo por conversación, con las dos campañas CONV. Así no se mezcla la inversión de las campañas de alcance.</p>
+</section>
+
+<section>
+ <h2>Entrega diaria</h2>
+ <p class="sub">Pasa el cursor por los gráficos para ver el valor de cada día.</p>
+ <div class="grid2">
+  <div class="card"><p class="ctitle">Impresiones y alcance por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Impresiones</span><span><i class="sw line" style="background:var(--s2)"></i>Alcance diario</span></div><div class="chart" id="ch-del"></div></div>
+  <div class="card"><p class="ctitle">Leads y conversaciones por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Leads (formulario)</span><span><i class="sw line" style="background:var(--s2)"></i>Conversaciones WhatsApp</span></div><div class="chart" id="ch-res"></div></div>
+ </div>
+</section>
+
+<section>
+ <h2>Hallazgos clave</h2>
+ <p class="sub">Lo más importante del mes, con las cifras que lo sustentan.</p>
+ <div class="findings" id="findings"></div>
+</section>
+
+<section>
+ <h2>Resultados por campaña</h2>
+ <p class="sub">Cada campaña se mide con el resultado para el que optimiza. Ordenadas por inversión.</p>
+ <div class="card" style="margin-bottom:16px"><p class="ctitle">Participación en la inversión</p><div class="chart" id="ch-camp"></div></div>
+ <div class="card tblwrap"><table id="camps"></table></div>
+</section>
+
+<section>
+ <h2>Ubicaciones</h2>
+ <p class="sub">Dónde se mostraron los anuncios y cuánto costó cada plataforma.</p>
+ <div class="grid2">
+  <div class="card"><p class="ctitle">Impresiones vs. inversión por plataforma</p><div class="legend"><span><i class="sw" style="background:var(--s1)"></i>% de impresiones</span><span><i class="sw" style="background:var(--s2)"></i>% de inversión</span></div><div class="chart" id="ch-plat"></div></div>
+  <div class="card tblwrap"><table id="plat"></table></div>
+ </div>
+</section>
+
+<section>
+ <h2>Audiencia</h2>
+ <p class="sub">Alcance y resultados por género y edad.</p>
+ <div class="grid2">
+  <div class="card"><p class="ctitle">Por género</p><div class="legend"><span><i class="sw" style="background:var(--s1)"></i>Mujeres</span><span><i class="sw" style="background:var(--s2)"></i>Hombres</span></div><div class="chart" id="ch-gen"></div></div>
+  <div class="card"><p class="ctitle">Alcance por edad</p><div class="legend"><span><i class="sw" style="background:var(--s1)"></i>Mujeres</span><span><i class="sw" style="background:var(--s2)"></i>Hombres</span></div><div class="chart" id="ch-age"></div></div>
+ </div>
+</section>
+
+<section>
+ <h2>Alcance por país</h2>
+ <p class="sub">Los países con menos de 50.000 cuentas alcanzadas se agrupan en “Resto”.</p>
+ <div class="grid2">
+  <div class="card"><p class="ctitle">Alcance por país</p><div class="chart" id="ch-ctry"></div></div>
+  <div class="card tblwrap"><table id="ctry"></table></div>
+ </div>
+</section>
+
+<section>
+ <h2>Creativos</h2>
+ <p class="sub">Los 12 anuncios con más impresiones del mes. La barra muestra cómo se repartieron sus impresiones entre plataformas.</p>
+ <div class="card">
+  <div class="legend" id="leg-ads"></div>
+  <div id="ads"></div>
+ </div>
+</section>
+
+<section>
+ <h2>Detalle diario</h2>
+ <p class="sub">Total de la cuenta por día.</p>
+ <div class="card tblwrap"><table id="daily"></table></div>
+</section>
+
+<section>
+ <h2>Notas</h2>
+ <ul class="notes">
+  <li><b>Fuente:</b> Meta Ads, cuenta HIDALGO TOURS BM (Hidalgo Corp), extracción del 17 de noviembre de 2026. Atribución: clic de 7 días o visualización de 1 día.</li>
+  <li><b>Leads:</b> formularios instantáneos completados. <b>Conversaciones:</b> conversaciones de mensajes iniciadas (WhatsApp) después de 7 días sin contacto.</li>
+  <li><b>Interacciones:</b> todas las acciones sobre el anuncio (reacciones, comentarios, compartidos, clics y reproducciones). Tasa = interacciones ÷ impresiones.</li>
+  <li><b>ThruPlays:</b> reproducciones de video de 15 segundos o hasta el final.</li>
+  <li>El alcance diario no se suma: una misma cuenta puede verse varios días. El alcance del mes es de cuentas únicas.</li>
+  <li>Los desgloses por edad, género y país no suman exactamente el alcance único, porque Meta los calcula por separado. En género se omiten las cuentas sin género declarado.</li>
+  <li>Todos los montos están en bolivianos (Bs).</li>
+ </ul>
+</section>
+
+<footer><span>Información confidencial · Propiedad de Hidalgo Corp</span><span>Reporte de Meta Ads · Octubre 2026</span></footer>
+</div></div>
+
+<script>
+const D = {"daily": [{"d": 1, "reach": 133376, "imp": 151573, "spend": 903.17, "eng": 33059, "thru": 10154, "clk": 1442, "lead": 266, "conv": 35}, {"d": 2, "reach": 193516, "imp": 241912, "spend": 1708.33, "eng": 44948, "thru": 11779, "clk": 2289, "lead": 401, "conv": 58}, {"d": 3, "reach": 178041, "imp": 224894, "spend": 1518.79, "eng": 43996, "thru": 11524, "clk": 1903, "lead": 301, "conv": 91}, {"d": 4, "reach": 273046, "imp": 364126, "spend": 1896.43, "eng": 55778, "thru": 14816, "clk": 2690, "lead": 421, "conv": 76}, {"d": 5, "reach": 256891, "imp": 376961, "spend": 1565.83, "eng": 46858, "thru": 12915, "clk": 2238, "lead": 322, "conv": 40}, {"d": 6, "reach": 171488, "imp": 210809, "spend": 957.63, "eng": 28728, "thru": 8741, "clk": 1359, "lead": 215, "conv": 30}, {"d": 7, "reach": 179790, "imp": 247239, "spend": 1396.23, "eng": 33947, "thru": 10390, "clk": 1547, "lead": 265, "conv": 71}, {"d": 8, "reach": 195106, "imp": 248493, "spend": 1758.14, "eng": 35534, "thru": 10777, "clk": 1545, "lead": 187, "conv": 119}, {"d": 9, "reach": 157784, "imp": 176334, "spend": 1284.97, "eng": 28390, "thru": 9363, "clk": 1432, "lead": 252, "conv": 123}, {"d": 10, "reach": 160952, "imp": 177900, "spend": 1208.37, "eng": 30395, "thru": 8897, "clk": 1517, "lead": 261, "conv": 99}, {"d": 11, "reach": 213582, "imp": 240283, "spend": 1557.52, "eng": 37946, "thru": 10491, "clk": 1829, "lead": 276, "conv": 169}, {"d": 12, "reach": 180538, "imp": 201651, "spend": 1243.18, "eng": 31026, "thru": 9362, "clk": 1536, "lead": 233, "conv": 141}, {"d": 13, "reach": 168712, "imp": 190018, "spend": 1216.76, "eng": 27308, "thru": 8738, "clk": 1507, "lead": 248, "conv": 105}, {"d": 14, "reach": 139657, "imp": 165336, "spend": 1040.76, "eng": 23385, "thru": 7674, "clk": 1426, "lead": 249, "conv": 90}, {"d": 15, "reach": 128910, "imp": 149943, "spend": 1061.1, "eng": 22126, "thru": 7034, "clk": 1085, "lead": 161, "conv": 112}, {"d": 16, "reach": 174648, "imp": 201838, "spend": 1373.51, "eng": 25982, "thru": 7773, "clk": 1512, "lead": 216, "conv": 114}, {"d": 17, "reach": 144139, "imp": 169742, "spend": 1154.0, "eng": 27286, "thru": 7300, "clk": 1204, "lead": 181, "conv": 86}, {"d": 18, "reach": 184674, "imp": 213066, "spend": 1407.92, "eng": 32182, "thru": 7664, "clk": 1392, "lead": 196, "conv": 124}, {"d": 19, "reach": 183203, "imp": 224640, "spend": 1502.43, "eng": 40411, "thru": 9966, "clk": 1647, "lead": 251, "conv": 99}, {"d": 20, "reach": 155051, "imp": 177256, "spend": 1473.82, "eng": 27627, "thru": 7735, "clk": 1240, "lead": 146, "conv": 163}, {"d": 21, "reach": 129053, "imp": 157503, "spend": 1410.31, "eng": 26836, "thru": 8662, "clk": 1499, "lead": 227, "conv": 137}, {"d": 22, "reach": 115707, "imp": 130289, "spend": 1235.11, "eng": 23573, "thru": 7663, "clk": 1228, "lead": 208, "conv": 84}, {"d": 23, "reach": 107339, "imp": 121318, "spend": 1044.16, "eng": 20334, "thru": 7052, "clk": 1068, "lead": 186, "conv": 58}, {"d": 24, "reach": 141986, "imp": 153428, "spend": 1420.03, "eng": 23490, "thru": 7773, "clk": 1412, "lead": 209, "conv": 88}, {"d": 25, "reach": 184168, "imp": 211329, "spend": 1711.55, "eng": 34516, "thru": 10862, "clk": 2008, "lead": 298, "conv": 107}, {"d": 26, "reach": 132108, "imp": 148764, "spend": 1221.98, "eng": 19381, "thru": 5541, "clk": 1159, "lead": 139, "conv": 95}, {"d": 27, "reach": 78391, "imp": 85429, "spend": 761.75, "eng": 4536, "thru": 1067, "clk": 503, "lead": 38, "conv": 67}, {"d": 28, "reach": 66706, "imp": 74952, "spend": 637.8, "eng": 4874, "thru": 1265, "clk": 422, "lead": 30, "conv": 71}, {"d": 29, "reach": 76014, "imp": 81813, "spend": 646.18, "eng": 6926, "thru": 1603, "clk": 794, "lead": 54, "conv": 51}, {"d": 30, "reach": 57809, "imp": 67603, "spend": 579.27, "eng": 4263, "thru": 821, "clk": 979, "lead": 26, "conv": 32}, {"d": 31, "reach": 103145, "imp": 154490, "spend": 995.56, "eng": 12204, "thru": 2549, "clk": 1426, "lead": 31, "conv": 44}], "tot": {"spend": 38892.59, "reach": 2396069, "freq": 2.395979, "imp": 5740932, "cpm": 6.77, "eng": 857845, "thru": 247951, "clk": 44838, "lead": 6494, "conv": 2779, "ctr": 1.86}, "sep": {"spend": 24130.67, "reach": 1599491, "freq": 2.174984, "imp": 3478868, "cpm": 6.94, "eng": 538933, "thru": 185741, "clk": 28461, "lead": 4097, "conv": 3134, "ctr": 2.27}, "camps": [["HC_HT_FORM_LATAM + BOL | JUN_2026", "Leads (formulario)", 17893.23, 1100254, 2177610, 1.98, 8.22, "Leads", 6480, 2.76, 6480, 307, 468800], ["HC_HT_CONV_BOLIVIA | OCT_2026", "Conversaciones WhatsApp", 10119.89, 340436, 1086989, 3.19, 9.31, "Conversaciones", 1632, 6.2, 0, 1632, 85623], ["HC_HT_CONV_LATAM | MAY_2026", "Conversaciones WhatsApp", 5472.95, 125046, 239868, 1.92, 22.82, "Conversaciones", 809, 6.77, 10, 809, 44007], ["HC_HT_RCH_COMPARTAMOS | BOL + LATAM", "Alcance", 1535.05, 548784, 1209638, 2.2, 1.27, "Alcance", 548784, 2.8, 4, 27, 33976], ["HC_HT_INTERACCIÓN_COMPARTAMOS_SEPT_2026", "Interacción", 1520.95, 146324, 244826, 1.67, 6.21, "Interacciones", 179277, 0.0085, 0, 1, 179277], ["HC_HT_RCH_WH_EEUU + EUROPA | AGO 2026", "Alcance", 1224.14, 175005, 217644, 1.24, 5.62, "Alcance", 175005, 6.99, 0, 0, 301], ["HC_HT_RCH_BOLIVIA + LATAM_LANZAMIENTO_PRIVÉ", "Alcance", 890.1, 292023, 522226, 1.79, 1.7, "Alcance", 292023, 3.05, 0, 1, 43786], ["HC_HT_RECLUTAMIENTO_2026", "Reclutamiento", 236.28, 29837, 42131, 1.41, 5.61, "Clics en el enlace", 1890, 0.125, 0, 2, 2075]], "plat": [["Facebook", 1984530, 4379558, 24397.46, 721074, 36049, 5232, 2006], ["Instagram", 456862, 1150509, 13559.3, 118444, 7716, 1262, 686], ["WhatsApp", 114159, 192548, 654.34, 10449, 981, 0, 84], ["Threads", 10916, 12268, 51.37, 7584, 0, 0, 0], ["Audience Network", 2530, 6049, 230.12, 285, 92, 0, 3]], "ag": [{"age": "18-24", "g": "female", "reach": 8727, "imp": 14258, "spend": 100.74, "lead": 0, "conv": 0}, {"age": "18-24", "g": "male", "reach": 5782, "imp": 8758, "spend": 57.12, "lead": 0, "conv": 0}, {"age": "25-34", "g": "female", "reach": 493228, "imp": 1253968, "spend": 8259.44, "lead": 1334, "conv": 606}, {"age": "25-34", "g": "male", "reach": 455378, "imp": 1150433, "spend": 5251.15, "lead": 967, "conv": 311}, {"age": "35-44", "g": "female", "reach": 335316, "imp": 826434, "spend": 6987.37, "lead": 1315, "conv": 593}, {"age": "35-44", "g": "male", "reach": 305774, "imp": 712566, "spend": 3749.35, "lead": 745, "conv": 233}, {"age": "45-54", "g": "female", "reach": 193803, "imp": 437513, "spend": 4563.31, "lead": 794, "conv": 400}, {"age": "45-54", "g": "male", "reach": 182180, "imp": 395768, "spend": 2279.42, "lead": 423, "conv": 124}, {"age": "55-64", "g": "female", "reach": 125933, "imp": 243898, "spend": 2850.83, "lead": 349, "conv": 242}, {"age": "55-64", "g": "male", "reach": 113973, "imp": 247448, "spend": 1495.32, "lead": 213, "conv": 62}, {"age": "65+", "g": "female", "reach": 79223, "imp": 164883, "spend": 1736.57, "lead": 173, "conv": 128}, {"age": "65+", "g": "male", "reach": 90052, "imp": 184028, "spend": 1151.98, "lead": 140, "conv": 60}], "ctry": [["Bolivia", 1312547, 3887800, 20666.61, 3308, 1764], ["Perú", 247463, 399582, 3677.9, 952, 344], ["Argentina", 189766, 384080, 1509.5, 158, 67], ["Colombia", 125556, 190321, 2710.16, 466, 170], ["Ecuador", 119320, 237526, 1991.05, 507, 123], ["México", 90910, 147557, 908.02, 251, 60], ["España", 88737, 113449, 610.7, 0, 0], ["Chile", 78276, 144758, 2151.64, 366, 210], ["Francia", 65042, 75784, 451.34, 0, 0], ["Brasil", 61028, 116792, 3922.63, 486, 26], ["Alemania", 11100, 12491, 73.15, 0, 0], ["Estados Unidos", 10075, 10811, 61.99, 0, 0], ["Panamá", 9249, 14868, 130.89, 0, 14], ["Reino Unido", 4698, 5113, 27.01, 0, 0]], "ads": [["AD2_CARTELERA TOURS", "RCH Compartamos", 1073.09, 852972, 432932, "Alcance", 432932, 2.48, 1352, 1085, 0.23, {"Facebook": 824186, "Instagram": 28786}], ["POST | FULL DAY V2", "FORM LATAM + BOL", 4603.17, 836466, 450564, "Leads", 2519, 1.83, 228957, 12628, 3.15, {"Facebook": 809653, "Instagram": 26778, "Audience Network": 35}], ["POST | 4D/3N", "FORM LATAM + BOL", 5272.46, 567850, 390115, "Leads", 2115, 2.49, 149704, 11656, 4.14, {"Facebook": 486284, "Instagram": 81563, "Audience Network": 3}], ["AD1 _ REFLEJO DEL SALAR", "RCH Compartamos", 378.06, 300146, 208655, "Alcance", 208655, 1.81, 26665, 196, 0.28, {"Facebook": 251112, "Instagram": 18619, "WhatsApp": 29745, "Threads": 670}], ["AD2_LANZAMIENTO", "RCH Lanzamiento Privé", 529.04, 258529, 143573, "Alcance", 143573, 3.68, 20024, 111, 0.1, {"Facebook": 150397, "Instagram": 101148, "WhatsApp": 6984}], ["AD3 - 2D/1N V2", "CONV Bolivia", 2158.65, 256778, 138590, "Conversaciones", 528, 4.09, 2702, 1994, 2.05, {"Facebook": 191425, "Instagram": 45712, "WhatsApp": 17585, "Audience Network": 2056}], ["AD 26 - 4D/3N (a)", "FORM LATAM + BOL", 1385.93, 246711, 164998, "Leads", 569, 2.44, 3076, 2390, 3.1, {"Facebook": 246710, "Audience Network": 1}], ["AD1_LANZAMIENTO", "RCH Lanzamiento Privé", 196.51, 175401, 103510, "Alcance", 103510, 1.9, 17105, 229, 0.24, {"Facebook": 159964, "Instagram": 8672, "WhatsApp": 6765}], ["POST FB - HTxCOMPARTAMOS", "Interacción Compartamos", 1089.41, 168465, 115123, "Interacciones", 125649, 0.0087, 125649, 212, 0.82, {"Facebook": 155853, "Instagram": 1014, "Threads": 11598}], ["AD 26 - 4D/3N (b)", "FORM LATAM + BOL", 602.78, 162761, 96425, "Leads", 331, 1.82, 1689, 1382, 2.31, {"Facebook": 162760, "Audience Network": 1}], ["AD 1 - 3D/2N", "CONV Bolivia", 1813.68, 130431, 65197, "Conversaciones", 552, 3.29, 25230, 839, 2.75, {"Facebook": 81559, "Instagram": 46242, "WhatsApp": 2627, "Audience Network": 3}], ["REEL 3D/2N", "FORM LATAM + BOL", 3905.13, 116190, 60801, "Leads", 485, 8.05, 42390, 1888, 2.8, {"Facebook": 26005, "Instagram": 90179, "Audience Network": 6}]]};
+const $ = s => document.querySelector(s);
+const nf = (n, d=0) => { const s = Math.abs(n).toFixed(d).split('.'); s[0] = s[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.'); return (n<0?'−':'') + s.join(','); };
+const bs = (n, d=2) => 'Bs ' + nf(n, d);
+const pct = (n, d=1) => nf(n, d) + '%';
+const short = n => n >= 1e6 ? nf(n/1e6, 2) + ' M' : n >= 1e3 ? nf(n/1e3, n>=1e5?0:1) + ' mil' : nf(n);
+const chg = (a, b) => (b - a) / a * 100;
+const T = D.tot, S = D.sep;
+const css = v => getComputedStyle(document.querySelector('.viz-root')).getPropertyValue(v).trim();
+
+// Derived
+const formS = D.camps[0][2], formL = D.camps[0][8];
+const convSep = {spend: 2350.38 + 6760.26, conv: 636 + 2103};
+const convOct = {spend: 5472.95 + 10119.89, conv: 809 + 1632};
+const cplSep = 2.38, cplOct = 2.76;
+const cpcSep = convSep.spend / convSep.conv, cpcOct = convOct.spend / convOct.conv;
+const engR = T.eng / T.imp * 100, engRS = S.eng / S.imp * 100;
+
+$('#lede').innerHTML = `En octubre se invirtieron <b>${bs(T.spend,0)}</b> (+${nf(chg(S.spend,T.spend),0)}% vs. septiembre) y la pauta alcanzó a <b>${nf(T.reach)}</b> cuentas únicas. Generó <b>${nf(T.lead)} leads</b> por formulario y <b>${nf(T.conv)} conversaciones</b> de WhatsApp. El formulario fue el formato más eficiente (${bs(cplOct)} por lead), mientras que el costo por conversación casi se duplicó.`;
+
+// KPIs
+const kp = [
+ ['Alcance único', nf(T.reach), 'cuentas alcanzadas en el mes', chg(S.reach,T.reach), true],
+ ['Frecuencia', nf(T.freq,2), 'veces que cada cuenta vio la pauta', chg(S.freq,T.freq), null],
+ ['Impresiones', short(T.imp), nf(T.imp) + ' en 31 días de pauta', chg(S.imp,T.imp), true],
+ ['Inversión', bs(T.spend,0), 'CPM de ' + bs(T.cpm), chg(S.spend,T.spend), null],
+ ['Interacciones', short(T.eng), pct(engR) + ' de las impresiones · ' + bs(T.spend/T.eng,3) + ' c/u', chg(S.eng,T.eng), true],
+ ['Reproducciones', short(T.thru), 'ThruPlays: vistas de 15 s o completas', chg(S.thru,T.thru), true],
+ ['Leads', nf(T.lead), bs(cplOct) + ' por lead en la campaña de formulario', chg(S.lead,T.lead), true],
+ ['Conversaciones', nf(T.conv), bs(cpcOct) + ' por conversación en las campañas CONV', chg(S.conv,T.conv), true],
+];
+$('#kpis').innerHTML = kp.map(([l,v,n,d,goodUp]) => {
+  const cls = goodUp === null ? 'neutral' : ((d >= 0) === goodUp ? 'up-good' : 'down-bad');
+  return `<div class="card kpi"><div class="lab">${l}</div><div class="val">${v}</div><div class="note">${n}</div><div class="delta ${cls}">${d>=0?'▲':'▼'} ${nf(Math.abs(d),1)}% vs. sep</div></div>`;
+}).join('');
+
+// Comparison table
+const rows = [
+ ['Inversión', S.spend, T.spend, v=>bs(v,0), null],
+ ['Alcance único', S.reach, T.reach, nf, true],
+ ['Impresiones', S.imp, T.imp, nf, true],
+ ['Frecuencia', S.freq, T.freq, v=>nf(v,2), null],
+ ['CPM', S.cpm, T.cpm, v=>bs(v), false],
+ ['Interacciones', S.eng, T.eng, nf, true],
+ ['Tasa de interacción', engRS, engR, v=>pct(v,2), true],
+ ['ThruPlays', S.thru, T.thru, nf, true],
+ ['Clics en el enlace', S.clk, T.clk, nf, true],
+ ['Leads (formulario)', S.lead, T.lead, nf, true],
+ ['Costo por lead (campaña FORM)', cplSep, cplOct, v=>bs(v), false],
+ ['Conversaciones WhatsApp', S.conv, T.conv, nf, true],
+ ['Costo por conversación (campañas CONV)', cpcSep, cpcOct, v=>bs(v), false],
+];
+$('#cmp').innerHTML = '<thead><tr><th>Indicador</th><th class="n">Septiembre</th><th class="n">Octubre</th><th class="n">Diferencia</th><th class="n">Variación</th><th>Estado</th></tr></thead><tbody>' +
+ rows.map(([l,a,b,f,goodUp]) => {
+  const d = chg(a,b); const diff = b - a;
+  let st;
+  if (goodUp === null) st = `<span class="status neutral">● Referencia</span>`;
+  else if (Math.abs(d) < 3) st = `<span class="status neutral">● Estable</span>`;
+  else if ((d > 0) === goodUp) st = `<span class="status up-good">✓ Mejora</span>`;
+  else st = `<span class="status down-bad">✕ Empeora</span>`;
+  return `<tr><td>${l}</td><td class="n">${f(a)}</td><td class="n"><b>${f(b)}</b></td><td class="n">${diff>=0?'+':'−'}${f(Math.abs(diff)).replace('Bs ','Bs ')}</td><td class="n">${d>=0?'+':'−'}${nf(Math.abs(d),1)}%</td><td>${st}</td></tr>`;
+ }).join('') + '</tbody>';
+
+// Tooltip helper
+function tipFor(host){ const t=document.createElement('div'); t.className='tip'; host.appendChild(t); return {
+  show(html,x,y){ t.innerHTML=html; t.style.opacity=1; const w=t.offsetWidth, hw=host.clientWidth; let left=x+14; if(left+w>hw) left=x-w-14; if(left<0) left=0; t.style.left=left+'px'; t.style.top=Math.max(0,y-10)+'px'; },
+  hide(){ t.style.opacity=0; } }; }
+const svgEl = (tag, attrs) => { const e=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const k in attrs) e.setAttribute(k,attrs[k]); return e; };
+
+// Line chart
+function lineChart(id, series, labels){
+  const host=$(id), W=Math.max(300,host.clientWidth), H=250, m={l:46,r:12,t:10,b:26};
+  const svg=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'}); host.appendChild(svg);
+  const max=Math.max(...series.flatMap(s=>s.v)); const step=niceStep(max/4); const top=Math.ceil(max/step)*step;
+  const x=i=>m.l+i*(W-m.l-m.r)/(labels.length-1), y=v=>H-m.b-v/top*(H-m.t-m.b);
+  for(let v=0; v<=top+1e-9; v+=step){ svg.appendChild(svgEl('line',{x1:m.l,x2:W-m.r,y1:y(v),y2:y(v),stroke:css('--grid'),'stroke-width':1})); const t=svgEl('text',{x:m.l-8,y:y(v)+4,'text-anchor':'end','font-size':11,fill:css('--text-muted')}); t.textContent=short(v); svg.appendChild(t); }
+  labels.forEach((l,i)=>{ if(i%5===0||i===labels.length-1){ const t=svgEl('text',{x:x(i),y:H-6,'text-anchor':'middle','font-size':11,fill:css('--text-muted')}); t.textContent=l; svg.appendChild(t);} });
+  series.forEach(s=>{ svg.appendChild(svgEl('path',{d:s.v.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(''),fill:'none',stroke:css(s.c),'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'})); });
+  const cross=svgEl('line',{y1:m.t,y2:H-m.b,stroke:css('--axis'),'stroke-width':1,opacity:0}); svg.appendChild(cross);
+  const dots=series.map(s=>{const c=svgEl('circle',{r:4.5,fill:css(s.c),stroke:css('--surface-1'),'stroke-width':2,opacity:0}); svg.appendChild(c); return c;});
+  const hit=svgEl('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent'}); svg.appendChild(hit);
+  const tip=tipFor(host);
+  hit.addEventListener('mousemove',e=>{ const r=svg.getBoundingClientRect(); const px=(e.clientX-r.left)*W/r.width; const i=Math.max(0,Math.min(labels.length-1,Math.round((px-m.l)/((W-m.l-m.r)/(labels.length-1)))));
+    cross.setAttribute('x1',x(i)); cross.setAttribute('x2',x(i)); cross.setAttribute('opacity',1);
+    series.forEach((s,k)=>{dots[k].setAttribute('cx',x(i)); dots[k].setAttribute('cy',y(s.v[i])); dots[k].setAttribute('opacity',1);});
+    tip.show(`<div class="t">${labels[i]} de octubre</div>`+series.map(s=>`<div class="r"><i class="sw" style="background:${css(s.c)}"></i>${s.n}<b>${nf(s.v[i])}</b></div>`).join(''), x(i)*r.width/W, e.clientY-host.getBoundingClientRect().top); });
+  hit.addEventListener('mouseleave',()=>{cross.setAttribute('opacity',0);dots.forEach(d=>d.setAttribute('opacity',0));tip.hide();});
+}
+function niceStep(raw){ const p=Math.pow(10,Math.floor(Math.log10(raw))); const f=raw/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p; }
+
+// Horizontal bars (grouped allowed)
+function hbars(id, items, series, opts={}){
+  const host=$(id); let rowH=opts.rowH||(series.length>1?34:26), lw=opts.lw||150, W=Math.max(300,host.clientWidth), vw=opts.vw||64;
+  const H=items.length*rowH+4; const svg=svgEl('svg',{viewBox:`0 0 ${W} ${H}`,role:'img'}); host.appendChild(svg);
+  const max=opts.max||Math.max(...items.flatMap(it=>series.map(s=>s.get(it))));
+  lw=Math.min(lw,Math.round(W*0.42)); const bw=W-lw-vw-8; const bh=series.length>1?12:16; const tip=tipFor(host);
+  items.forEach((it,i)=>{
+    const y0=i*rowH+(rowH-(bh*series.length+2*(series.length-1)))/2;
+    const t=svgEl('text',{x:lw-10,y:i*rowH+rowH/2+4,'text-anchor':'end','font-size':12.5,fill:css('--text-secondary')}); t.textContent=opts.label(it); svg.appendChild(t); while(t.getComputedTextLength()>lw-14 && t.textContent.length>4){ t.textContent=t.textContent.slice(0,-2)+'…'; }
+    series.forEach((s,k)=>{ const v=s.get(it); const w=Math.max(2,v/max*bw); const y=y0+k*(bh+2);
+      svg.appendChild(w<8 ? svgEl('rect',{x:lw,y:y,width:w,height:bh,rx:1,fill:css(s.c)}) : svgEl('path',{d:`M${lw} ${y} h${w-4} a4 4 0 0 1 4 4 v${bh-8} a4 4 0 0 1 -4 4 h-${w-4} z`,fill:css(s.c)}));
+      if(opts.showVal!==false){ const vt=svgEl('text',{x:lw+w+6,y:y+bh/2+4,'font-size':11.5,'font-weight':600,fill:css('--text-primary')}); vt.textContent=s.fmt(v); svg.appendChild(vt);} });
+    const hit=svgEl('rect',{x:0,y:i*rowH,width:W,height:rowH,fill:'transparent'}); svg.appendChild(hit);
+    hit.addEventListener('mousemove',e=>{ const hr=host.getBoundingClientRect(); tip.show(`<div class="t">${opts.label(it)}</div>`+opts.tip(it), e.clientX-hr.left, e.clientY-hr.top); });
+    hit.addEventListener('mouseleave',()=>tip.hide());
+  });
+}
+
+// Daily charts
+const lbl = D.daily.map(d=>String(d.d));
+lineChart('#ch-del',[{n:'Impresiones',c:'--s1',v:D.daily.map(d=>d.imp)},{n:'Alcance diario',c:'--s2',v:D.daily.map(d=>d.reach)}],lbl);
+lineChart('#ch-res',[{n:'Leads',c:'--s1',v:D.daily.map(d=>d.lead)},{n:'Conversaciones',c:'--s2',v:D.daily.map(d=>d.conv)}],lbl);
+
+// Findings
+const pk = D.daily.reduce((a,b)=>b.imp>a.imp?b:a);
+const first26 = D.daily.slice(0,26), last5 = D.daily.slice(26);
+const avg = (arr,k)=>arr.reduce((s,d)=>s+d[k],0)/arr.length;
+const ig = D.plat[1], fb = D.plat[0];
+const fem = D.ag.filter(a=>a.g==='female'), mal = D.ag.filter(a=>a.g==='male');
+const sum = (arr,k)=>arr.reduce((s,d)=>s+d[k],0);
+const F = [
+ ['Más escala a menor costo', `La inversión subió <b>${nf(chg(S.spend,T.spend),0)}%</b> y el alcance <b>${nf(chg(S.reach,T.reach),0)}%</b>, hasta <b>${nf(T.reach)}</b> cuentas. El CPM bajó de ${bs(S.cpm)} a <b>${bs(T.cpm)}</b>, así que el crecimiento no encareció la entrega.`],
+ ['El formulario sostiene los resultados', `La campaña FORM se llevó el <b>${nf(formS/T.spend*100,0)}%</b> de la inversión y generó el <b>${nf(formL/T.lead*100,1)}%</b> de los leads: <b>${nf(formL)}</b> a ${bs(cplOct)} cada uno. Su mejor pieza fue <b>POST | FULL DAY V2</b> (2.519 leads a Bs 1,83). La más cara fue <b>REEL 3D/2N</b> (Bs 8,05 por lead).`],
+ ['WhatsApp se encareció', `Las conversaciones bajaron <b>${nf(Math.abs(chg(S.conv,T.conv)),0)}%</b> aunque la inversión en las campañas CONV subió ${nf(chg(convSep.spend,convOct.spend),0)}%. El costo por conversación pasó de ${bs(cpcSep)} a <b>${bs(cpcOct)}</b>. En CONV LATAM el CPM llegó a <b>Bs 22,82</b>, y CONV BOLIVIA cerró con frecuencia de <b>3,19</b>, una señal de saturación de la audiencia.`, true],
+ ['Caída de entrega desde el 27 de octubre', `La inversión diaria bajó de un promedio de <b>${bs(avg(first26,'spend'),0)}</b> (1–26 oct) a <b>${bs(avg(last5,'spend'),0)}</b> (27–31 oct). La campaña FORM pasó de ~Bs 570 a ~Bs 140 por día, y los leads de <b>${nf(avg(first26,'lead'),0)}</b> a <b>${nf(avg(last5,'lead'),0)}</b> diarios. Conviene revisar si fue un cambio de presupuesto o un problema de entrega.`, true],
+ ['Interacción levemente menor, con un bajón al cierre', `La tasa de interacción fue de <b>${pct(engR)}</b> (${pct(engRS)} en septiembre). El pico de impresiones fue el <b>${pk.d} de octubre</b> (${nf(pk.imp)}). Los últimos cinco días la tasa diaria cayó a ~${pct(sum(last5,'eng')/sum(last5,'imp')*100,0)}, porque perdió peso el formulario, que concentra el ${nf(468800/T.eng*100,0)}% de las interacciones.`],
+ ['Instagram cuesta el doble que Facebook', `Facebook entregó el <b>${nf(fb[2]/T.imp*100,0)}%</b> de las impresiones con un CPM de ${bs(fb[3]/fb[2]*1000)}. Instagram tuvo el ${nf(ig[2]/T.imp*100,0)}% de las impresiones pero el <b>${nf(ig[3]/T.spend*100,0)}%</b> de la inversión (CPM ${bs(ig[3]/ig[2]*1000)}). En audiencia, las <b>mujeres</b> generaron el ${nf(sum(fem,'lead')/(sum(fem,'lead')+sum(mal,'lead'))*100,0)}% de los leads y el <b>${nf(sum(fem,'conv')/(sum(fem,'conv')+sum(mal,'conv'))*100,0)}%</b> de las conversaciones.`],
+];
+$('#findings').innerHTML = F.map(([h,p,al])=>`<div class="card finding${al?' alert':''}"><h3>${al?'<span class="down-bad">⚠</span> ':''}${h}</h3><p>${p}</p></div>`).join('');
+
+// Campaigns
+const NICE={'HC_HT_FORM_LATAM + BOL | JUN_2026':'FORM LATAM + BOL','HC_HT_CONV_BOLIVIA | OCT_2026':'CONV Bolivia','HC_HT_CONV_LATAM | MAY_2026':'CONV LATAM','HC_HT_RCH_COMPARTAMOS | BOL + LATAM':'Alcance Compartamos','HC_HT_INTERACCIÓN_COMPARTAMOS_SEPT_2026':'Interacción Compartamos','HC_HT_RCH_WH_EEUU + EUROPA | AGO 2026':'Alcance EEUU + Europa','HC_HT_RCH_BOLIVIA + LATAM_LANZAMIENTO_PRIVÉ':'Alcance Lanzamiento Privé','HC_HT_RECLUTAMIENTO_2026':'Reclutamiento'};
+const short_c = n => NICE[n]||n;
+hbars('#ch-camp', D.camps, [{c:'--s1',get:c=>c[2]/T.spend*100,fmt:v=>pct(v)}], {label:c=>short_c(c[0]), lw:180, max:50, tip:c=>`<div class="r">Inversión<b>${bs(c[2])}</b></div><div class="r">Objetivo<b>${c[1]}</b></div>`});
+const cprFmt = c => c[7]==='Alcance' ? bs(c[9])+' / mil' : c[9] < 0.05 ? bs(c[9],3) : bs(c[9]);
+$('#camps').style.fontSize='13px';
+$('#camps').innerHTML = '<thead><tr><th>Campaña</th><th>Objetivo</th><th class="n">Inversión</th><th class="n">Alcance</th><th class="n">Frec.</th><th class="n">CPM</th><th class="n">Resultados</th><th class="n">Costo / resultado</th></tr></thead><tbody>' +
+ D.camps.map(c=>`<tr><td><b>${short_c(c[0])}</b><div style="font-size:11px;color:var(--text-muted);word-break:break-all">${c[0]}</div></td><td>${c[1]}</td><td class="n">${bs(c[2])}</td><td class="n">${nf(c[3])}</td><td class="n">${nf(c[5],2)}</td><td class="n">${bs(c[6])}</td><td class="n">${nf(c[8])}<div style="font-size:11px;color:var(--text-muted)">${c[7].toLowerCase()}</div></td><td class="n">${cprFmt(c)}</td></tr>`).join('') +
+ `<tr><td><b>Total</b></td><td></td><td class="n"><b>${bs(T.spend)}</b></td><td class="n"><b>${nf(T.reach)}</b></td><td class="n"><b>${nf(T.freq,2)}</b></td><td class="n"><b>${bs(T.cpm)}</b></td><td class="n"></td><td></td></tr></tbody>`;
+
+// Platforms
+hbars('#ch-plat', D.plat.slice(0,4), [{c:'--s1',get:p=>p[2]/T.imp*100,fmt:v=>pct(v)},{c:'--s2',get:p=>p[3]/T.spend*100,fmt:v=>pct(v)}], {label:p=>p[0], lw:100, max:80, tip:p=>`<div class="r">Impresiones<b>${nf(p[2])}</b></div><div class="r">Inversión<b>${bs(p[3])}</b></div><div class="r">CPM<b>${bs(p[3]/p[2]*1000)}</b></div>`});
+$('#plat').innerHTML = '<thead><tr><th>Plataforma</th><th class="n">Impresiones</th><th class="n">Particip.</th><th class="n">CPM</th><th class="n">Leads</th><th class="n">Conv.</th></tr></thead><tbody>' +
+ D.plat.map(p=>`<tr><td>${p[0]}</td><td class="n">${nf(p[2])}</td><td class="n">${pct(p[2]/T.imp*100)}</td><td class="n">${bs(p[3]/p[2]*1000)}</td><td class="n">${nf(p[6])}</td><td class="n">${nf(p[7])}</td></tr>`).join('') + '</tbody>';
+
+// Gender
+const G=[{n:'Alcance',k:'reach'},{n:'Inversión',k:'spend'},{n:'Leads',k:'lead'},{n:'Conversaciones',k:'conv'}].map(o=>({n:o.n,f:sum(fem,o.k),m:sum(mal,o.k)}));
+hbars('#ch-gen', G, [{c:'--s1',get:g=>g.f/(g.f+g.m)*100,fmt:v=>pct(v,0)},{c:'--s2',get:g=>g.m/(g.f+g.m)*100,fmt:v=>pct(v,0)}], {label:g=>g.n, lw:110, max:100, tip:g=>`<div class="r"><i class="sw" style="background:${css('--s1')}"></i>Mujeres<b>${g.n==='Inversión'?bs(g.f,0):nf(g.f)}</b></div><div class="r"><i class="sw" style="background:${css('--s2')}"></i>Hombres<b>${g.n==='Inversión'?bs(g.m,0):nf(g.m)}</b></div>`});
+// Age
+const ages=['18-24','25-34','35-44','45-54','55-64','65+'];
+const A=ages.map(a=>({a, f:D.ag.find(x=>x.age===a&&x.g==='female'), m:D.ag.find(x=>x.age===a&&x.g==='male')}));
+hbars('#ch-age', A, [{c:'--s1',get:a=>a.f.reach,fmt:short},{c:'--s2',get:a=>a.m.reach,fmt:short}], {label:a=>a.a+' años', lw:80, tip:a=>`<div class="r"><i class="sw" style="background:${css('--s1')}"></i>Mujeres<b>${nf(a.f.reach)}</b></div><div class="r"><i class="sw" style="background:${css('--s2')}"></i>Hombres<b>${nf(a.m.reach)}</b></div><div class="r">Leads<b>${nf(a.f.lead+a.m.lead)}</b></div><div class="r">Conversaciones<b>${nf(a.f.conv+a.m.conv)}</b></div>`});
+
+// Countries
+const big = D.ctry.filter(c=>c[1]>=50000), rest = D.ctry.filter(c=>c[1]<50000);
+const restRow = ['Resto ('+rest.length+')', ...[1,2,3,4,5].map(i=>rest.reduce((s,c)=>s+c[i],0))];
+const CT = [...big, restRow];
+hbars('#ch-ctry', CT, [{c:'--s1',get:c=>c[1],fmt:short}], {label:c=>c[0], lw:110, tip:c=>`<div class="r">Alcance<b>${nf(c[1])}</b></div><div class="r">Inversión<b>${bs(c[3])}</b></div><div class="r">Leads<b>${nf(c[4])}</b></div><div class="r">Conversaciones<b>${nf(c[5])}</b></div>`});
+$('#ctry').innerHTML = '<thead><tr><th>País</th><th class="n">Inversión</th><th class="n">% inv.</th><th class="n">Leads</th><th class="n">Conv.</th></tr></thead><tbody>' +
+ CT.map(c=>`<tr><td>${c[0]}</td><td class="n">${bs(c[3],0)}</td><td class="n">${pct(c[3]/T.spend*100)}</td><td class="n">${nf(c[4])}</td><td class="n">${nf(c[5])}</td></tr>`).join('') + '</tbody>';
+
+// Creatives
+const PC={'Facebook':'--s1','Instagram':'--s2','WhatsApp':'--s3','Threads':'--s4','Audience Network':'--s5'};
+$('#leg-ads').innerHTML = Object.entries(PC).map(([k,v])=>`<span><i class="sw" style="background:var(${v})"></i>${k}</span>`).join('');
+const maxImp = D.ads[0][3];
+$('#ads').innerHTML = D.ads.map(a=>{
+  const segs = Object.entries(a[11]).filter(([k,v])=>v/a[3]>=0.004);
+  const res = a[5]==='Alcance' ? `Alcance ${nf(a[6])} · ${bs(a[2])} invertidos` : `${nf(a[6])} ${a[5].toLowerCase()} · ${a[7]<0.05?bs(a[7],3):bs(a[7])} c/u · CTR ${pct(a[10],2)}`;
+  return `<div class="cr"><div><div class="nm">${a[0]}</div><div class="cp">${a[1]}</div></div><div><div class="bar" style="width:${Math.max(8,a[3]/maxImp*100)}%">${segs.map(([k,v])=>`<i title="${k}: ${nf(v)} (${pct(v/a[3]*100)})" style="flex:${v};background:var(${PC[k]})"></i>`).join('')}</div><div class="rs">${res}</div></div><div class="im">${short(a[3])}</div></div>`;
+}).join('');
+
+// Daily table
+$('#daily').innerHTML = '<thead><tr><th>Fecha</th><th class="n">Alcance</th><th class="n">Impresiones</th><th class="n">Interacciones</th><th class="n">Tasa int.</th><th class="n">ThruPlays</th><th class="n">Leads</th><th class="n">Conv.</th><th class="n">Inversión</th><th class="n">CPM</th></tr></thead><tbody>' +
+ D.daily.map(d=>`<tr><td>${String(d.d).padStart(2,'0')}/10</td><td class="n">${nf(d.reach)}</td><td class="n">${nf(d.imp)}</td><td class="n">${nf(d.eng)}</td><td class="n">${pct(d.eng/d.imp*100)}</td><td class="n">${nf(d.thru)}</td><td class="n">${nf(d.lead)}</td><td class="n">${nf(d.conv)}</td><td class="n">${bs(d.spend)}</td><td class="n">${bs(d.spend/d.imp*1000)}</td></tr>`).join('') +
+ `<tr><td><b>Total</b></td><td class="n"><b>${nf(T.reach)}*</b></td><td class="n"><b>${nf(T.imp)}</b></td><td class="n"><b>${nf(T.eng)}</b></td><td class="n"><b>${pct(engR)}</b></td><td class="n"><b>${nf(T.thru)}</b></td><td class="n"><b>${nf(T.lead)}</b></td><td class="n"><b>${nf(T.conv)}</b></td><td class="n"><b>${bs(T.spend)}</b></td><td class="n"><b>${bs(T.cpm)}</b></td></tr></tbody>`;
+$('#daily').insertAdjacentHTML('afterend','<p class="sub" style="margin:8px 0 0">* Alcance único del mes, no la suma de los días.</p>');
+</script>
+</body>
+</html>
