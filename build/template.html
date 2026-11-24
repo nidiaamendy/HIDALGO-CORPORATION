@@ -152,9 +152,14 @@ footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--border);font-
   <p class="sub" id="msub"></p>
   <div class="kpis" id="kpis"></div>
  </section>
+ <section id="sec-day">
+  <h2 id="day-title">Rendimiento del último día</h2>
+  <p class="sub" id="day-sub"></p>
+  <div class="kpis" id="day-kpis"></div>
+ </section>
  <section>
   <h2 id="cmp-title"></h2>
-  <p class="sub">La referencia es el mes anterior. El estado indica si el cambio va en la dirección deseada.</p>
+  <p class="sub" id="cmp-sub">La referencia es el mes anterior. El estado indica si el cambio va en la dirección deseada.</p>
   <div class="card tblwrap"><table id="cmp"></table></div>
  </section>
  <section>
@@ -163,6 +168,8 @@ footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--border);font-
   <div class="grid2">
    <div class="card"><p class="ctitle">Impresiones y alcance por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Impresiones</span><span><i class="sw line" style="background:var(--s2)"></i>Alcance diario</span></div><div class="chart" id="ch-del"></div></div>
    <div class="card"><p class="ctitle">Leads y conversaciones por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Leads (formulario)</span><span><i class="sw line" style="background:var(--s2)"></i>Conversaciones WhatsApp</span></div><div class="chart" id="ch-res"></div></div>
+   <div class="card"><p class="ctitle">Inversión por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Inversión (Bs)</span></div><div class="chart" id="ch-spend"></div></div>
+   <div class="card"><p class="ctitle">CPM por día</p><div class="legend"><span><i class="sw line" style="background:var(--s1)"></i>Costo por mil impresiones (Bs)</span></div><div class="chart" id="ch-eng"></div></div>
   </div>
  </section>
  <section>
@@ -256,6 +263,11 @@ function derive(k){
     leadSpend, convSpend, leadCamps: lc, convCamps: cc};
 }
 const DV = Object.fromEntries(KEYS.map(k=>[k,derive(k)]));
+function deriveCmp(k){ const c=DATA.months[k].cmpPrev; if(!c) return null; const t=c.tot;
+  const lc=c.camps.filter(x=>x.rtype==='Leads'), cc=c.camps.filter(x=>x.rtype==='Conversaciones'); const lr=sum(lc,'results'), cr=sum(cc,'results');
+  return {...t, engR: t.imp? t.eng/t.imp*100 : 0, cpl: lr? sum(lc,'spend')/lr : null, cpc: cr? sum(cc,'spend')/cr : null}; }
+const PARTIAL = k => !!DATA.months[k].partial;
+const pDay = k => +DATA.months[k].partial.slice(8);
 
 // ---- generic helpers
 function tipFor(host){ const t=document.createElement('div'); t.className='tip'; host.appendChild(t); return {
@@ -328,7 +340,7 @@ const kpiCard = (l,v,n,dh) => `<div class="card kpi"><div class="lab">${l}</div>
 // ---- NAV
 function nav(cur){
   $('#nav').innerHTML = `<span class="brand">Hidalgo Tours</span><button class="pill year" data-k="year" aria-pressed="${cur==='year'}">Año ${YEAR}</button>` +
-    KEYS.map(k=>`<button class="pill" data-k="${k}" aria-pressed="${cur===k}">${mShort(k)}</button>`).join('');
+    KEYS.map(k=>`<button class="pill" data-k="${k}" aria-pressed="${cur===k}"${PARTIAL(k)?` title="Mes en curso: datos al ${pDay(k)}"`:''}>${mShort(k)}${PARTIAL(k)?' ·':''}</button>`).join('');
   $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>{ location.hash = b.dataset.k==='year' ? 'anio' : 'mes-'+b.dataset.k; });
   const sel=$('#nav').querySelector('[aria-pressed="true"]'); if(sel) sel.scrollIntoView({block:'nearest',inline:'center'});
 }
@@ -338,7 +350,7 @@ function renderYear(){
   const first=KEYS[0], last=KEYS[KEYS.length-1];
   const T = {spend:sum(KEYS,k=>DV[k].spend), imp:sum(KEYS,k=>DV[k].imp), reach:sum(KEYS,k=>DV[k].reach), eng:sum(KEYS,k=>DV[k].eng), thru:sum(KEYS,k=>DV[k].thru), lead:sum(KEYS,k=>DV[k].lead), conv:sum(KEYS,k=>DV[k].conv), clk:sum(KEYS,k=>DV[k].clk),
     leadSpend:sum(KEYS,k=>DV[k].leadSpend), leadRes:sum(KEYS,k=>sum(DV[k].leadCamps,'results')), convSpend:sum(KEYS,k=>DV[k].convSpend), convRes:sum(KEYS,k=>sum(DV[k].convCamps,'results'))};
-  const per = `${mName(first)} a ${mName(last)} ${YEAR}`;
+  const per = `${mName(first)} a ${mName(last)} ${YEAR}`+(PARTIAL(last)?` (${mName(last)} al ${pDay(last)})`:'');
   $('#eyebrow').textContent = `Reporte de pauta · Meta Ads · ${cap(per)}`;
   $('#title').textContent = `Hidalgo Tours: resumen del año ${YEAR}`;
   const best = KEYS.reduce((a,b)=>DV[b].spend>DV[a].spend?b:a);
@@ -364,7 +376,7 @@ function renderYear(){
   lineChart('#y-res',[{n:'Leads',c:'--s1',v:KEYS.map(k=>DV[k].lead)},{n:'Conversaciones',c:'--s2',v:KEYS.map(k=>DV[k].conv)}],lab,{dots:true,every:1,tipTitle:tt});
   lineChart('#y-cpr',[{n:'Costo por lead',c:'--s1',v:KEYS.map(k=>DV[k].cpl),fmt:v=>bs(v)},{n:'Costo por conversación',c:'--s2',v:KEYS.map(k=>DV[k].cpc),fmt:v=>bs(v)}],lab,{dots:true,every:1,money:true,tipTitle:tt});
   $('#ytable').innerHTML = '<thead><tr><th>Mes</th><th class="n">Inversión</th><th class="n">Alcance</th><th class="n">Impresiones</th><th class="n">CPM</th><th class="n">Tasa int.</th><th class="n">Leads</th><th class="n">Costo/lead</th><th class="n">Conv.</th><th class="n">Costo/conv.</th></tr></thead><tbody>' +
-    KEYS.map(k=>{const d=DV[k]; return `<tr class="click" data-k="${k}"><td><b>${cap(mName(k))}</b></td><td class="n">${bs(d.spend,0)}</td><td class="n">${nf(d.reach)}</td><td class="n">${nf(d.imp)}</td><td class="n">${bs(d.cpm)}</td><td class="n">${pct(d.engR)}</td><td class="n">${nf(d.lead)}</td><td class="n">${bs(d.cpl)}</td><td class="n">${nf(d.conv)}</td><td class="n">${bs(d.cpc)}</td></tr>`}).join('') +
+    KEYS.map(k=>{const d=DV[k]; return `<tr class="click" data-k="${k}"><td><b>${cap(mName(k))}</b>${PARTIAL(k)?` <span style="font-weight:400;color:var(--text-secondary)">(al ${pDay(k)})</span>`:''}</td><td class="n">${bs(d.spend,0)}</td><td class="n">${nf(d.reach)}</td><td class="n">${nf(d.imp)}</td><td class="n">${bs(d.cpm)}</td><td class="n">${pct(d.engR)}</td><td class="n">${nf(d.lead)}</td><td class="n">${bs(d.cpl)}</td><td class="n">${nf(d.conv)}</td><td class="n">${bs(d.cpc)}</td></tr>`}).join('') +
     `<tr><td><b>Total</b></td><td class="n"><b>${bs(T.spend,0)}</b></td><td class="n"><b>${nf(T.reach)}*</b></td><td class="n"><b>${nf(T.imp)}</b></td><td class="n"><b>${bs(T.spend/T.imp*1000)}</b></td><td class="n"><b>${pct(T.eng/T.imp*100)}</b></td><td class="n"><b>${nf(T.lead)}</b></td><td class="n"><b>${bs(T.leadRes?T.leadSpend/T.leadRes:null)}</b></td><td class="n"><b>${nf(T.conv)}</b></td><td class="n"><b>${bs(T.convRes?T.convSpend/T.convRes:null)}</b></td></tr></tbody>`;
   $('#ytable').querySelectorAll('tr.click').forEach(tr=>tr.onclick=()=>go(tr.dataset.k));
   // findings
@@ -388,15 +400,19 @@ function autoYear(T){
 // ---- MONTH VIEW
 let OBJ='Todos';
 function renderMonth(k){
-  const M=DATA.months[k], D=DV[k]; const i=KEYS.indexOf(k); const pk=i>0?KEYS[i-1]:null, P=pk?DV[pk]:null; const ref = pk? mShort(pk).toLowerCase() : '';
+  const M=DATA.months[k], D=DV[k]; const i=KEYS.indexOf(k); const pk=i>0?KEYS[i-1]:null; const part=PARTIAL(k);
+  const Pc = part ? deriveCmp(k) : null; const P = part ? Pc : (pk?DV[pk]:null);
+  const ref = part && Pc ? `1–${+M.cmpPrev.until.slice(8)} ${MS[+M.cmpPrev.until.slice(5,7)-1].toLowerCase().slice(0,3)}` : (pk? mShort(pk).toLowerCase() : '');
   const nm=mName(k);
   $('#eyebrow').textContent = `Reporte de pauta · Meta Ads · ${cap(nm)} ${k.slice(0,4)}`;
   const nCamp = M.camps.filter(c=>!c.name.startsWith('Otras')).length;
   $('#title').textContent = M.title || `Hidalgo Tours: resultados de ${nm}`;
-  const lastDay = new Date(+k.slice(0,4), +k.slice(5), 0).getDate();
-  $('#lede').innerHTML = M.lede || `En ${nm} se invirtieron <b>${bs(D.spend,0)}</b>${P?` (${chg(P.spend,D.spend)>=0?'+':'−'}${nf(Math.abs(chg(P.spend,D.spend)),0)}% vs. ${mName(pk)})`:''} y la pauta alcanzó a <b>${nf(D.reach)}</b> cuentas únicas. Generó <b>${nf(D.lead)} leads</b> por formulario y <b>${nf(D.conv)} conversaciones</b> de WhatsApp.`;
-  $('#chips').innerHTML = [`Periodo: 1–${lastDay} ${MS[+k.slice(5)-1].toLowerCase()} ${k.slice(0,4)}`,'Cuenta: HIDALGO TOURS BM',`${nCamp} campañas con inversión`,'Montos en bolivianos (Bs)'].map(c=>`<span class="chip">${c}</span>`).join('');
-  $('#msub').textContent = P ? `Total de la cuenta en ${nm}. Debajo de cada indicador, la variación contra ${mName(pk)}.` : `Total de la cuenta en ${nm}.`;
+  const lastDay = part ? pDay(k) : new Date(+k.slice(0,4), +k.slice(5), 0).getDate();
+  const pref = part ? (Pc ? `los mismos días de ${mName(pk)}` : '') : (pk? mName(pk) : '');
+  $('#lede').innerHTML = M.lede || `${part?`Del 1 al ${lastDay} de ${nm} (mes en curso)`:`En ${nm}`} se invirtieron <b>${bs(D.spend,0)}</b>${P?` (${chg(P.spend,D.spend)>=0?'+':'−'}${nf(Math.abs(chg(P.spend,D.spend)),0)}% vs. ${pref})`:''} y la pauta alcanzó a <b>${nf(D.reach)}</b> cuentas únicas. Generó <b>${nf(D.lead)} leads</b> por formulario y <b>${nf(D.conv)} conversaciones</b> de WhatsApp.`;
+  $('#chips').innerHTML = [`Periodo: 1–${lastDay} ${MS[+k.slice(5)-1].toLowerCase()} ${k.slice(0,4)}${part?' · mes en curso':''}`,'Cuenta: HIDALGO TOURS BM',`${nCamp} campañas con inversión`,'Montos en bolivianos (Bs)'].map(c=>`<span class="chip">${c}</span>`).join('');
+  $('#msub').textContent = part ? `Total de la cuenta del 1 al ${lastDay} de ${nm}.${P?` Debajo de cada indicador, la variación contra los mismos días de ${mName(pk)} (1–${+M.cmpPrev.until.slice(8)}).`:''}` : (P ? `Total de la cuenta en ${nm}. Debajo de cada indicador, la variación contra ${mName(pk)}.` : `Total de la cuenta en ${nm}.`);
+  renderDay(k);
   const dd=(a,b,g)=>deltaHtml(P?chg(a,b):null,g,ref);
   $('#kpis').innerHTML = [
     kpiCard('Alcance único', nf(D.reach), 'cuentas alcanzadas en el mes', dd(P&&P.reach,D.reach,true)),
@@ -409,9 +425,11 @@ function renderMonth(k){
     kpiCard('Conversaciones', nf(D.conv), D.cpc!=null? bs(D.cpc)+' por conversación en campañas de WhatsApp':'sin campañas de WhatsApp', dd(P&&P.conv,D.conv,true)),
   ].join('');
   // comparison
-  $('#cmp-title').textContent = P ? `${cap(nm)} vs. ${mName(pk)}` : `${cap(nm)}`;
+  $('#cmp-title').textContent = part ? (P ? `${cap(nm)} (1–${lastDay}) vs. ${mName(pk)} (1–${+M.cmpPrev.until.slice(8)})` : `${cap(nm)} (1–${lastDay})`) : (P ? `${cap(nm)} vs. ${mName(pk)}` : `${cap(nm)}`);
+  $('#cmp-sub').textContent = part ? 'El mes todavía no cierra: la referencia son los mismos días del mes anterior. El estado indica si el cambio va en la dirección deseada.' : 'La referencia es el mes anterior. El estado indica si el cambio va en la dirección deseada.';
+  const colA = part ? `${cap(mName(pk))} 1–${P?+M.cmpPrev.until.slice(8):''}` : (pk?cap(mName(pk)):''), colB = part ? `${cap(nm)} 1–${lastDay}` : cap(nm);
   const rows = [['Inversión','spend',v=>bs(v,0),null],['Alcance único','reach',nf,true],['Impresiones','imp',nf,true],['Frecuencia','freq',v=>nf(v,2),null],['CPM','cpm',v=>bs(v),false],['Interacciones','eng',nf,true],['Tasa de interacción','engR',v=>pct(v,2),true],['ThruPlays','thru',nf,true],['Clics en el enlace','clk',nf,true],['Leads (formulario)','lead',nf,true],['Costo por lead','cpl',v=>bs(v),false],['Conversaciones WhatsApp','conv',nf,true],['Costo por conversación','cpc',v=>bs(v),false]];
-  $('#cmp').innerHTML = `<thead><tr><th>Indicador</th>${P?`<th class="n">${cap(mName(pk))}</th>`:''}<th class="n">${cap(nm)}</th>${P?'<th class="n">Variación</th><th>Estado</th>':''}</tr></thead><tbody>` +
+  $('#cmp').innerHTML = `<thead><tr><th>Indicador</th>${P?`<th class="n">${colA}</th>`:''}<th class="n">${colB}</th>${P?'<th class="n">Variación</th><th>Estado</th>':''}</tr></thead><tbody>` +
    rows.map(([l,key,f,g])=>{ const a=P?P[key]:null, b=D[key]; const d=(a!=null&&b!=null)?chg(a,b):null; let st='';
      if(P){ if(d==null) st='<span class="status neutral">—</span>'; else if(g===null) st='<span class="status neutral">● Referencia</span>'; else if(Math.abs(d)<3) st='<span class="status neutral">● Estable</span>'; else if((d>0)===g) st='<span class="status up-good">✓ Mejora</span>'; else st='<span class="status down-bad">✕ Empeora</span>'; }
      return `<tr><td>${l}</td>${P?`<td class="n">${f(a)}</td>`:''}<td class="n"><b>${f(b)}</b></td>${P?`<td class="n">${d==null?'—':(d>=0?'+':'−')+nf(Math.abs(d),1)+'%'}</td><td>${st}</td>`:''}</tr>`; }).join('') + '</tbody>';
@@ -419,6 +437,8 @@ function renderMonth(k){
   const dl=M.daily||[]; const lbl=dl.map(d=>String(d.d)); const tt=j=>`${dl[j].d} de ${nm}`;
   lineChart('#ch-del',[{n:'Impresiones',c:'--s1',v:dl.map(d=>d.imp)},{n:'Alcance diario',c:'--s2',v:dl.map(d=>d.reach)}],lbl,{tipTitle:tt});
   lineChart('#ch-res',[{n:'Leads',c:'--s1',v:dl.map(d=>d.lead)},{n:'Conversaciones',c:'--s2',v:dl.map(d=>d.conv)}],lbl,{tipTitle:tt});
+  lineChart('#ch-spend',[{n:'Inversión',c:'--s1',v:dl.map(d=>d.spend),fmt:v=>bs(v)}],lbl,{tipTitle:tt,money:true});
+  lineChart('#ch-eng',[{n:'CPM',c:'--s1',v:dl.map(d=>d.imp?d.spend/d.imp*1000:null),fmt:v=>bs(v)}],lbl,{tipTitle:tt,money:true});
   // findings
   const F = M.findings && M.findings.length ? M.findings : autoMonth(k);
   $('#findings').innerHTML = F.map(f=>`<div class="card finding${f.alert?' alert':''}"><h3>${f.alert?'<span class="down-bad">⚠</span> ':''}${f.h}</h3><p>${f.p}</p></div>`).join('');
@@ -456,6 +476,28 @@ function renderMonth(k){
     dl.map(d=>`<tr><td>${String(d.d).padStart(2,'0')}/${k.slice(5)}</td><td class="n">${nf(d.reach)}</td><td class="n">${nf(d.imp)}</td><td class="n">${nf(d.eng)}</td><td class="n">${d.imp?pct(d.eng/d.imp*100):'—'}</td><td class="n">${nf(d.thru)}</td><td class="n">${nf(d.lead)}</td><td class="n">${nf(d.conv)}</td><td class="n">${bs(d.spend)}</td><td class="n">${d.imp?bs(d.spend/d.imp*1000):'—'}</td></tr>`).join('') +
     `<tr><td><b>Total</b></td><td class="n"><b>${nf(D.reach)}*</b></td><td class="n"><b>${nf(D.imp)}</b></td><td class="n"><b>${nf(D.eng)}</b></td><td class="n"><b>${pct(D.engR)}</b></td><td class="n"><b>${nf(D.thru)}</b></td><td class="n"><b>${nf(D.lead)}</b></td><td class="n"><b>${nf(D.conv)}</b></td><td class="n"><b>${bs(D.spend)}</b></td><td class="n"><b>${bs(D.cpm)}</b></td></tr></tbody>`;
 }
+function renderDay(k){
+  const M=DATA.months[k], dl=M.daily||[]; const sec=$('#sec-day');
+  if(!PARTIAL(k) || !dl.length){ sec.classList.add('hide'); return; } sec.classList.remove('hide');
+  const L=dl[dl.length-1], prev=dl.slice(Math.max(0,dl.length-8), dl.length-1); const n=prev.length; const nm=mName(k);
+  const avg=f=>n? sum(prev,f)/n : null;
+  const cpm=d=>d.imp?d.spend/d.imp*1000:null, er=d=>d.imp?d.eng/d.imp*100:null;
+  const A={reach:avg('reach'), imp:avg('imp'), spend:avg('spend'), eng:avg('eng'), lead:avg('lead'), conv:avg('conv'), clk:avg('clk')};
+  A.cpm = A.imp? A.spend/A.imp*1000 : null; A.er = A.imp? A.eng/A.imp*100 : null;
+  $('#day-title').textContent = `Rendimiento del último día: ${L.d} de ${nm}`;
+  $('#day-sub').textContent = n ? `Total de la cuenta el ${L.d} de ${nm}. Debajo, la variación contra el promedio diario de los ${n} días anteriores.` : `Total de la cuenta el ${L.d} de ${nm}.`;
+  const dd=(a,b,g)=>{ if(a==null||!n) return deltaHtml(null); const d=chg(a,b); return `<div class="delta ${g===null?'neutral':((d>=0)===g?'up-good':'down-bad')}">${d>=0?'▲':'▼'} ${nf(Math.abs(d),1)}% vs. prom. ${n} días</div>`; };
+  $('#day-kpis').innerHTML = [
+    kpiCard('Inversión', bs(L.spend,0), `promedio diario: ${bs(A.spend,0)}`, dd(A.spend,L.spend,null)),
+    kpiCard('Alcance', nf(L.reach), `promedio diario: ${nf(A.reach)}`, dd(A.reach,L.reach,true)),
+    kpiCard('Impresiones', nf(L.imp), `CPM de ${bs(cpm(L))} (prom. ${bs(A.cpm)})`, dd(A.imp,L.imp,true)),
+    kpiCard('CPM', bs(cpm(L)), 'costo por mil impresiones', dd(A.cpm,cpm(L),false)),
+    kpiCard('Interacciones', nf(L.eng), `${pct(er(L))} de las impresiones (prom. ${pct(A.er)})`, dd(A.eng,L.eng,true)),
+    kpiCard('Clics en el enlace', nf(L.clk), `promedio diario: ${nf(A.clk)}`, dd(A.clk,L.clk,true)),
+    kpiCard('Leads', nf(L.lead), `promedio diario: ${nf(A.lead,0)}`, dd(A.lead,L.lead,true)),
+    kpiCard('Conversaciones', nf(L.conv), `promedio diario: ${nf(A.conv,0)}`, dd(A.conv,L.conv,true)),
+  ].join('');
+}
 function renderCamps(k){
   const M=DATA.months[k], D=DV[k];
   const objs=['Todos',...new Set(M.camps.map(c=>c.rtype).filter(r=>r!=='—'))];
@@ -471,7 +513,7 @@ function renderCamps(k){
     `<tr><td><b>Total${OBJ==='Todos'?'':' '+OBJ.toLowerCase()}</b></td><td></td><td class="n"><b>${bs(tot.spend)}</b></td><td></td><td></td><td></td><td class="n">${OBJ!=='Todos'?'<b>'+nf(tot.results)+'</b>':''}</td><td class="n">${OBJ!=='Todos'&&OBJ!=='Alcance'&&tot.results?'<b>'+bs(tot.spend/tot.results)+'</b>':''}</td></tr></tbody>`;
 }
 function autoMonth(k){
-  const M=DATA.months[k], D=DV[k]; const i=KEYS.indexOf(k); const pk=i>0?KEYS[i-1]:null, P=pk?DV[pk]:null; const F=[];
+  const M=DATA.months[k], D=DV[k]; const i=KEYS.indexOf(k); const pk=i>0?KEYS[i-1]:null, P=PARTIAL(k)?deriveCmp(k):(pk?DV[pk]:null); const F=[];
   if(P) F.push({h: chg(P.spend,D.spend)>=0?'Más inversión':'Menos inversión', p:`La inversión ${chg(P.spend,D.spend)>=0?'subió':'bajó'} <b>${nf(Math.abs(chg(P.spend,D.spend)),0)}%</b> vs. ${mName(pk)} y el alcance ${chg(P.reach,D.reach)>=0?'subió':'bajó'} <b>${nf(Math.abs(chg(P.reach,D.reach)),0)}%</b>. El CPM pasó de ${bs(P.cpm)} a <b>${bs(D.cpm)}</b>.`, alert: chg(P.cpm,D.cpm)>20});
   const top=[...M.camps].sort((a,b)=>b.spend-a.spend)[0];
   if(top) F.push({h:'Campaña principal', p:`<b>${top.name}</b> concentró el <b>${nf(top.spend/D.spend*100,0)}%</b> de la inversión${top.results&&top.rtype!=='—'?` y logró ${nf(top.results)} ${top.rtype.toLowerCase()}`:''}${top.cpr&&top.rtype!=='Alcance'?` a ${bs(top.cpr)} cada uno`:''}.`});

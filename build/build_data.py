@@ -7,6 +7,11 @@ Archivos esperados en RAW_DIR (respuestas de ads_get_ad_entities):
   agegender*.json       nivel cuenta, breakdowns age+gender, monthly
   country*.json         nivel cuenta, breakdown country, monthly
   ads*.txt|json         nivel anuncio, breakdown publisher_platform, monthly
+Mes en curso (parcial): si el detalle diario no llega al último día del mes, el mes se marca con
+  "partial": "AAAA-MM-DD" (último día con datos). Para compararlo contra los mismos días del mes anterior:
+  cmpacct_AAAA-MM.json   nivel cuenta, time_increment=all_days, mes ANTERIOR del día 1 al mismo día de corte
+  cmpcamps_AAAA-MM.json  nivel campaña, time_increment=all_days, mismo rango (AAAA-MM = el mes en curso)
+  Se guardan en months[AAAA-MM].cmpPrev = {until, tot, camps}. Cuando el mes se completa, partial y cmpPrev quedan en null.
 """
 import json, sys, glob, os
 from collections import defaultdict
@@ -57,9 +62,11 @@ M = defaultdict(dict)
 acct_rows = []
 if os.path.exists(os.path.join(RAW, 'account_monthly.json')):
     acct_rows = json.load(open(os.path.join(RAW, 'account_monthly.json')))
+def acct_row(x):
+    return [inum(x['reach']), num(x['frequency']), inum(x['impressions']), sp(x), num((x.get('cpm') or {}).get('value')),
+                      inum(x.get('post_engagement')), inum(x.get('video_thruplay_watched_actions')), inum(x.get('link_click')), inum(x.get('lead')), inum(x.get(CONV))]
 for x in rows('acct'):
-    acct_rows.append([mon(x), inum(x['reach']), num(x['frequency']), inum(x['impressions']), sp(x), num((x.get('cpm') or {}).get('value')),
-                      inum(x.get('post_engagement')), inum(x.get('video_thruplay_watched_actions')), inum(x.get('link_click')), inum(x.get('lead')), inum(x.get(CONV))])
+    acct_rows.append([mon(x)] + acct_row(x))
 for r in acct_rows:
     m, reach, freq, imp, spend, cpm, eng, thru, clk, lead, conv = r
     M[m]['tot'] = dict(reach=reach, freq=freq, imp=imp, spend=spend, cpm=cpm, eng=eng, thru=thru, clk=clk, lead=lead, conv=conv)
@@ -73,15 +80,17 @@ for x in rows('daily'):
         lead=inum(x.get('lead')), conv=inum(x.get(CONV)))
 for m, dd in daily.items(): M[m]['daily'] = [dd[k] for k in sorted(dd)]
 
-camps = defaultdict(list)
-for x in rows('camps'):
-    if sp(x) <= 0: continue
+def camp_row(x):
     ind, v = result_of(x); rt = RTYPE.get(ind, '—')
     s = sp(x)
     cpr = (s / v * 1000 if rt == 'Alcance' else s / v) if v else None
-    camps[mon(x)].append(dict(name=x['name'], obj=OBJ.get(x.get('objective'), x.get('objective') or ''), spend=round(s, 2),
+    return dict(name=x['name'], obj=OBJ.get(x.get('objective'), x.get('objective') or ''), spend=round(s, 2),
         reach=inum(x['reach']), imp=inum(x['impressions']), freq=round(num(x['frequency']), 2), cpm=round(num((x.get('cpm') or {}).get('value')), 2),
-        rtype=rt, results=v, cpr=round(cpr, 4) if cpr is not None else None, lead=inum(x.get('lead')), conv=inum(x.get(CONV)), eng=inum(x.get('post_engagement'))))
+        rtype=rt, results=v, cpr=round(cpr, 4) if cpr is not None else None, lead=inum(x.get('lead')), conv=inum(x.get(CONV)), eng=inum(x.get('post_engagement')))
+camps = defaultdict(list)
+for x in rows('camps'):
+    if sp(x) <= 0: continue
+    camps[mon(x)].append(camp_row(x))
 for m, cs in camps.items():
     cs.sort(key=lambda c: -c['spend'])
     gap = M[m]['tot']['spend'] - sum(c['spend'] for c in cs)
@@ -120,6 +129,23 @@ for m, d in ads.items():
     M[m]['ads'] = top
     M[m]['plat'] = sorted([dict(p=k, imp=v['imp'], spend=round(v['spend'], 2), lead=v['lead'], conv=v['conv'], eng=v['eng'], clk=v['clk']) for k, v in plat[m].items() if v['imp'] > 0], key=lambda r: -r['imp'])
 
+import calendar, re
+for m, v in M.items():
+    if 'daily' not in v: continue
+    y, mo = int(m[:4]), int(m[5:])
+    last = max(d['d'] for d in v['daily'])
+    v['partial'] = f'{m}-{last:02d}' if last < calendar.monthrange(y, mo)[1] else None
+    if not v['partial']: v['cmpPrev'] = None
+for f in sorted(glob.glob(os.path.join(RAW, 'cmpacct_*'))):
+    m = re.search(r'cmpacct_(\d{4}-\d{2})', f).group(1)
+    if not M[m].get('partial'): continue
+    reach, freq, imp, spend, cpm, eng, thru, clk, lead, conv = acct_row(load(f)[0])
+    cs = []
+    for g in sorted(glob.glob(os.path.join(RAW, f'cmpcamps_{m}*'))):
+        cs += [camp_row(x) for x in load(g) if sp(x) > 0]
+    y, mo = int(m[:4]), int(m[5:]); py, pm = (y, mo - 1) if mo > 1 else (y - 1, 12)
+    pd = min(int(M[m]['partial'][8:]), calendar.monthrange(py, pm)[1])
+    M[m]['cmpPrev'] = dict(until=f'{py}-{pm:02d}-{pd:02d}', tot=dict(reach=reach, freq=freq, imp=imp, spend=spend, cpm=cpm, eng=eng, thru=thru, clk=clk, lead=lead, conv=conv), camps=cs)
 for m, v in M.items():
     if 'tot' not in v: continue
     data['months'][m] = {**data['months'].get(m, {}), **v}
@@ -127,4 +153,5 @@ data['months'] = dict(sorted(data['months'].items()))
 json.dump(data, open(OUT, 'w'), ensure_ascii=False, separators=(',', ':'))
 for m, v in data['months'].items():
     print(m, 'gasto', v['tot']['spend'], 'camp', round(sum(c['spend'] for c in v['camps']), 2), 'dias', len(v.get('daily', [])), 'ads', len(v.get('ads', [])),
-          'plat_imp', sum(p['imp'] for p in v.get('plat', [])), 'imp', v['tot']['imp'])
+          'plat_imp', sum(p['imp'] for p in v.get('plat', [])), 'imp', v['tot']['imp'],
+          'parcial', v.get('partial'), 'cmp', (v.get('cmpPrev') or {}).get('until'))
